@@ -93,6 +93,8 @@ public class RuggedBuilder {
     /** DEM intersection algorithm. */
     private AlgorithmId algorithmID;
 
+    private IntersectionAlgorithm algorithm;
+
     /** Updater used to load Digital Elevation Model tiles. */
     private TileUpdater tileUpdater;
 
@@ -176,6 +178,7 @@ public class RuggedBuilder {
         lightTimeCorrection         = true;
         aberrationOfLightCorrection = true;
         name                        = "Rugged";
+        algorithm                   = null;
     }
 
     /** Set the reference ellipsoid.
@@ -857,6 +860,15 @@ public class RuggedBuilder {
         return Collections.unmodifiableList(sensors);
     }
 
+    public RuggedBuilder setIntersectionAlgorithm(final IntersectionAlgorithm algorithm) {
+        this.algorithm = algorithm;
+        return this;
+    }
+
+    public IntersectionAlgorithm createIntersectionAlgorithm() {
+        return createAlgorithm(algorithmID, tileUpdater, maxCachedTiles, constantElevation);
+    }
+
     /** Select inertial frame.
      * @param inertialFrameId inertial frame identifier
      * @return inertial frame
@@ -980,7 +992,14 @@ public class RuggedBuilder {
             }
         }
         createInterpolatorIfNeeded();
-        return new Rugged(createAlgorithm(algorithmID, tileUpdater, maxCachedTiles, constantElevation), ellipsoid,
+        IntersectionAlgorithm ruggedAlgo = null;
+        if (this.algorithm != null) {
+            ruggedAlgo = this.algorithm;
+        }
+        else {
+            ruggedAlgo = createAlgorithm(algorithmID, tileUpdater, maxCachedTiles, constantElevation);
+        }
+        return new Rugged(ruggedAlgo, ellipsoid,
                           lightTimeCorrection, aberrationOfLightCorrection, atmosphericRefraction, scToBody, sensors, name);
     }
 }
