@@ -59,7 +59,7 @@ public class TilesCache<T extends Tile> {
      * @param longitude ground point longitude
      * @return tile covering the ground point
      */
-    public T getTile(final double latitude, final double longitude) {
+    public synchronized T getTile(final double latitude, final double longitude) {
 
         for (int i = 0; i < tiles.length; ++i) {
             final T tile = tiles[i];
